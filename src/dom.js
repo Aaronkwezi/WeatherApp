@@ -4,6 +4,7 @@ import { converttoCelsius } from './Conversion.js';
 export function renderApp(){
     const appContainer = document.createElement('div');
     appContainer.id = 'app';
+
     const weatherDisplay = createWeatherDisplay();
     const searchForm = createSearchForm(weatherDisplay);
 
@@ -42,9 +43,48 @@ function createSearchForm(weatherDisplay) {
             submitButton.disabled = false;
         }
     });
+
     form.appendChild(searchInput);
     form.appendChild(submitButton);
     return form;
+}
+function navigateGeolocation(weatherDisplay) {
+    if (!navigator.geolocation) {
+        weatherDisplay.textContent = 'Geolocation is not supported by your browser.';
+        return;
+    }
+    navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+            const weatherData = await getWeather(`${latitude},${longitude}`);
+            // Keep coordinates for accurate weather, but show a readable place name.
+            const placeName = await getPlaceName(latitude, longitude);
+            updateWeatherDisplay(weatherDisplay, weatherData, placeName);
+        } catch (error) {
+            weatherDisplay.textContent = 'Unable to load weather for your location.';
+            console.error('Geolocation weather search failed:', error);
+        }
+    }, (error) => {
+        weatherDisplay.textContent = 'Unable to retrieve your location.';
+        console.error('Geolocation error:', error);
+    });
+}
+
+async function getPlaceName(latitude, longitude) {
+    try {
+        const response = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+        );
+        if (!response.ok) {
+            throw new Error(`Place lookup failed: ${response.status}`);
+        }
+        const place = await response.json();
+        const parts = [place.city || place.locality, place.principalSubdivision, place.countryName];
+        return [...new Set(parts.filter(Boolean))].join(', ') || 'your current location';
+    } catch (error) {
+        console.error('Place lookup failed:', error);
+        return 'your current location';
+    }
 }
 
 function createWeatherDisplay(weatherData) {
@@ -82,15 +122,16 @@ function togglecelsiusFahrenheit(weatherDisplay, weatherData) {
 };
 
 
-function updateWeatherDisplay(weatherDisplay, weatherData) {
+function updateWeatherDisplay(weatherDisplay, weatherData, placeName) {
     weatherDisplay.replaceChildren();
     const locationHeader = document.createElement('h2');
     locationHeader.textContent = weatherData
-        ? `Weather in ${weatherData.resolvedAddress}`
-        : 'Weather Information';
+        ? `Weather in ${placeName || weatherData.resolvedAddress}`
+        : 'Finding your location...';
     weatherDisplay.appendChild(locationHeader);
 
     if (!weatherData) {
+        navigateGeolocation(weatherDisplay);
         return;
     }
     const toggleButton = document.createElement('button');
