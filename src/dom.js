@@ -1,6 +1,7 @@
 
 import { getWeather } from './weather.js';
 import { converttoCelsius } from './Conversion.js';
+
 export function renderApp(){
     const appContainer = document.createElement('div');
     appContainer.id = 'app';
@@ -106,19 +107,26 @@ function togglecelsiusFahrenheit(weatherDisplay, weatherData) {
         const celsiusTemp = converttoCelsius(currentTemp);
         tempParagraph.textContent = `Temperature: ${celsiusTemp.toFixed(1)}°C`;
     }
-    const listItems = weatherDisplay.querySelectorAll('#future-forecast-list li');
-    listItems.forEach((item, index) => {
-        const dayData = weatherData.days[index];
+    weatherDisplay.querySelectorAll('.high-temp').forEach((item, index) => {
+        const highTemp = weatherData.days[index].tempmax;
         const isCelsius = item.textContent.includes('°C');
         if (isCelsius) {
-            item.textContent = `${dayData.datetime}: High ${dayData.tempmax}°F, Low ${dayData.tempmin}°F`;
+            item.textContent = `High: ${highTemp.toFixed(1)}°F`;
+        } else {
+            const highCelsius = converttoCelsius(highTemp);
+            item.textContent = `High: ${highCelsius.toFixed(1)}°C`;
         }
-        else {
-            const highCelsius = converttoCelsius(dayData.tempmax);
-            const lowCelsius = converttoCelsius(dayData.tempmin);
-            item.textContent = `${dayData.datetime}: High ${highCelsius.toFixed(1)}°C, Low ${lowCelsius.toFixed(1)}°C`;
+    });
+    weatherDisplay.querySelectorAll('.low-temp').forEach((item, index) => {
+        const lowTemp = weatherData.days[index].tempmin;
+        const isCelsius = item.textContent.includes('°C');
+        if (isCelsius) {
+            item.textContent = `Low: ${lowTemp.toFixed(1)}°F`;
+        } else {
+            const lowCelsius = converttoCelsius(lowTemp);
+            item.textContent = `Low: ${lowCelsius.toFixed(1)}°C`;
         }
-    }); 
+    });
 };
 
 
@@ -149,12 +157,27 @@ function updateWeatherDisplay(weatherDisplay, weatherData, placeName) {
     futureForecastHeader.textContent = 'Future Forecast';
     const forcastContainer = document.createElement('div');
     forcastContainer.id = 'forecast-container';
-    const futureForecastList = document.createElement('ul');
+    const futureForecastList = document.createElement('div');
     futureForecastList.id = 'future-forecast-list';
     for (const day of weatherData.days) {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${day.datetime}: High ${day.tempmax}°F, Low ${day.tempmin}°F`;
-        futureForecastList.appendChild(listItem);
+        const weekDay = document.createElement('p');
+        const date = new Date(`${day.datetime}T00:00:00`);
+        const weekday = date.toLocaleDateString(undefined, { weekday: 'short' });
+        weekDay.textContent = `${weekday}`;
+        const theDate = document.createElement('p');
+        theDate.textContent = `${date.toLocaleDateString()}`;
+        const High=document.createElement('p');
+        High.textContent = `High: ${day.tempmax}°F`;
+        High.classList.add('high-temp');
+        const Low=document.createElement('p');
+        Low.textContent = `Low: ${day.tempmin}°F`;
+        Low.classList.add('low-temp');
+        futureForecastList.appendChild(weekDay);
+        futureForecastList.appendChild(theDate);
+        futureForecastList.appendChild(High);
+        futureForecastList.appendChild(Low);
+    
+
     }
     forcastContainer.appendChild(futureForecastList);
     weatherDisplay.appendChild(toggleButton);
