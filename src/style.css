@@ -1,0 +1,25 @@
+body {
+    background-image: url('./backgroundImages/Sunset.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+}
+
+body[data-weather="clear-day"] {
+    background-image: url('./backgroundImages/Sunny.jpg');
+}
+
+body[data-weather="clear-night"],
+body[data-weather="partly-cloudy-night"] {
+    background-image: url('./backgroundImages/night.jpg');
+}
+
+body[data-weather="rain"] {
+    background-image: url('./backgroundImages/Rainy.jpg');
+}
+
+body[data-weather="cloudy"],
+body[data-weather="partly-cloudy-day"] {
+    background-image: url('./backgroundImages/Cloudy.jpg');
+}

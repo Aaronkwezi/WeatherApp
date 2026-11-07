@@ -2,6 +2,7 @@
 import { getWeather } from './weather.js';
 import { converttoCelsius } from './Conversion.js';
 
+
 export function renderApp(){
     const appContainer = document.createElement('div');
     appContainer.id = 'app';
@@ -142,6 +143,9 @@ function updateWeatherDisplay(weatherDisplay, weatherData, placeName) {
         navigateGeolocation(weatherDisplay);
         return;
     }
+    const weatherCondition = weatherData.currentConditions.icon;
+    document.body.setAttribute('data-weather', weatherCondition);
+    
     const toggleButton = document.createElement('button');
     toggleButton.textContent = 'Toggle °C/°F';
     toggleButton.addEventListener('click', () => togglecelsiusFahrenheit(weatherDisplay, weatherData));
