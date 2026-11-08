@@ -2,6 +2,12 @@
 import { getWeather } from './weather.js';
 import { converttoCelsius } from './Conversion.js';
 
+const weatherIcons = {
+    'clear-day': new URL('./WeatherIconSVG/clear-day.svg', import.meta.url).href,
+    'partly-cloudy-day': new URL('./WeatherIconSVG/partly-cloudy-day.svg', import.meta.url).href,
+    rain: new URL('./WeatherIconSVG/rain.svg', import.meta.url).href,
+    snow: new URL('./WeatherIconSVG/snow.svg', import.meta.url).href,
+};
 
 export function renderApp(){
     const appContainer = document.createElement('div');
@@ -145,10 +151,20 @@ function updateWeatherDisplay(weatherDisplay, weatherData, placeName) {
     }
     const weatherCondition = weatherData.currentConditions.icon;
     document.body.setAttribute('data-weather', weatherCondition);
-    
+
     const toggleButton = document.createElement('button');
+    toggleButton.id = 'toggle-button';
     toggleButton.textContent = 'Toggle °C/°F';
     toggleButton.addEventListener('click', () => togglecelsiusFahrenheit(weatherDisplay, weatherData));
+    const currentWeather = document.createElement('div');
+    currentWeather.id = 'current-weather';
+    const iconUrl = weatherIcons[weatherCondition];
+    if (iconUrl) {
+        const icon = document.createElement('img');
+        icon.src = iconUrl;
+        icon.alt = weatherCondition;
+        currentWeather.appendChild(icon);
+    }
     const tempParagraph = document.createElement('p');
     tempParagraph.textContent = `Temperature: ${weatherData.currentConditions.temp}°F`;
     const timezoneParagraph = document.createElement('p');
@@ -157,6 +173,11 @@ function updateWeatherDisplay(weatherDisplay, weatherData, placeName) {
     windParagraph.textContent = `Wind Speed: ${weatherData.currentConditions.windspeed} mph`;
     const humidityParagraph = document.createElement('p');
     humidityParagraph.textContent = `Humidity: ${weatherData.currentConditions.humidity}%`;
+    currentWeather.appendChild(tempParagraph);
+    currentWeather.appendChild(timezoneParagraph);
+    currentWeather.appendChild(windParagraph);
+    currentWeather.appendChild(humidityParagraph);
+
     const futureForecastHeader = document.createElement('h3');
     futureForecastHeader.textContent = 'Future Forecast';
     const forcastContainer = document.createElement('div');
@@ -164,6 +185,15 @@ function updateWeatherDisplay(weatherDisplay, weatherData, placeName) {
     const futureForecastList = document.createElement('div');
     futureForecastList.id = 'future-forecast-list';
     for (const day of weatherData.days) {
+        const forecastItem = document.createElement('div');
+        forecastItem.id = 'forecast-item';
+        const iconUrl = weatherIcons[day.icon];
+        if (iconUrl) {
+            const icon = document.createElement('img');
+            icon.src = iconUrl;
+            icon.alt = day.icon;
+            forecastItem.appendChild(icon);
+        }
         const weekDay = document.createElement('p');
         const date = new Date(`${day.datetime}T00:00:00`);
         const weekday = date.toLocaleDateString(undefined, { weekday: 'short' });
@@ -176,19 +206,16 @@ function updateWeatherDisplay(weatherDisplay, weatherData, placeName) {
         const Low=document.createElement('p');
         Low.textContent = `Low: ${day.tempmin}°F`;
         Low.classList.add('low-temp');
-        futureForecastList.appendChild(weekDay);
-        futureForecastList.appendChild(theDate);
-        futureForecastList.appendChild(High);
-        futureForecastList.appendChild(Low);
-    
+        forecastItem.appendChild(weekDay);
+        forecastItem.appendChild(theDate);
+        forecastItem.appendChild(High);
+        forecastItem.appendChild(Low);
+        futureForecastList.appendChild(forecastItem);
 
     }
     forcastContainer.appendChild(futureForecastList);
     weatherDisplay.appendChild(toggleButton);
-    weatherDisplay.appendChild(tempParagraph);
-    weatherDisplay.appendChild(timezoneParagraph);
-    weatherDisplay.appendChild(windParagraph);
-    weatherDisplay.appendChild(humidityParagraph);
+    weatherDisplay.appendChild(currentWeather);
     weatherDisplay.appendChild(futureForecastHeader);
     weatherDisplay.appendChild(forcastContainer);
 }
