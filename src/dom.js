@@ -3,10 +3,7 @@ import { converttoCelsius } from "./Conversion.js";
 
 const weatherIcons = {
   "clear-day": new URL("./WeatherIconSVG/clear-day.svg", import.meta.url).href,
-  "partly-cloudy-day": new URL(
-    "./WeatherIconSVG/partly-cloudy-day.svg",
-    import.meta.url,
-  ).href,
+  "partly-cloudy-day": new URL("./WeatherIconSVG/partly-cloudy-day.svg", import.meta.url).href,
   rain: new URL("./WeatherIconSVG/rain.svg", import.meta.url).href,
   snow: new URL("./WeatherIconSVG/snow.svg", import.meta.url).href,
 };
@@ -14,10 +11,12 @@ const weatherIcons = {
 export function renderApp() {
   const appContainer = document.createElement("div");
   appContainer.id = "app";
-
+  const header = document.createElement("h1");
+  header.id = "app-header";
+  header.textContent = "The KWEZI Weather App";
+  appContainer.appendChild(header);
   const weatherDisplay = createWeatherDisplay();
   const searchForm = createSearchForm(weatherDisplay);
-
   appContainer.appendChild(searchForm);
   appContainer.appendChild(weatherDisplay);
   document.body.appendChild(appContainer);
@@ -41,7 +40,6 @@ function createSearchForm(weatherDisplay) {
     if (!location) {
       return;
     }
-
     submitButton.disabled = true;
     try {
       const weatherData = await getWeather(location);

@@ -21,9 +21,28 @@ body[data-weather="rain"] {
   background-image: url("./backgroundImages/Rainy.jpg");
 }
 
+body[data-weather="snow"] {
+  background-image: url("./backgroundImages/Snowy.jpg");
+}
+
 body[data-weather="cloudy"],
 body[data-weather="partly-cloudy-day"] {
   background-image: url("./backgroundImages/Cloudy.jpg");
+}
+body[data-weather="clear-day"] #app-header,
+body[data-weather="cloudy"] #app-header,
+body[data-weather="partly-cloudy-day"] #app-header,
+body[data-weather="snow"] #app-header {
+  text-align: center;
+  color: #333;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+body[data-weather="clear-night"] #app-header,
+body[data-weather="partly-cloudy-night"] #app-header,
+body[data-weather="rain"] #app-header {
+  text-align: center;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 #forecast-container {
